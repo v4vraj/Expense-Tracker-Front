@@ -1,9 +1,11 @@
 import axios from "axios";
 import { useState } from "react";
 import { Card } from "../components/Card";
+import { useNavigate } from "react-router-dom";
 import "../scss/Login.scss";
 
 export const Login = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
@@ -39,6 +41,7 @@ export const Login = () => {
         password,
       });
       localStorage.setItem("token", response.data.token);
+      navigate("/");
     } catch (error) {
       console.log("Login Failed", error);
     }

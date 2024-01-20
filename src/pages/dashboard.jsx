@@ -1,3 +1,3 @@
-export const dashboard = () => {
-  return <div>hello</div>;
+export const Dashboard = () => {
+  return <div>Hello</div>;
 };
