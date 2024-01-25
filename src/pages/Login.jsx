@@ -36,7 +36,7 @@ export const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/login", {
+      const response = await axios.post("/api/user/login", {
         email,
         password,
       });
@@ -57,7 +57,7 @@ export const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/addUser", user);
+      const res = await axios.post("/api/user/addUser", user);
       console.log("User Added Successfully", res.data);
     } catch (error) {
       console.log("Error adding User", error);
