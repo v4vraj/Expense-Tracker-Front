@@ -1,0 +1,26 @@
+.sidebar {
+  &.collapsed {
+    width: 75px;
+  }
+
+  .header {
+    .icon {
+      font-size: 35px;
+      vertical-align: middle;
+    }
+
+    h1 {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+  }
+
+  .navItem {
+    .icon {
+      font-size: 20px;
+      vertical-align: middle;
+    }
+  }
+}
