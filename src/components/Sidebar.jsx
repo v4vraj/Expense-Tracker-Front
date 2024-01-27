@@ -5,6 +5,7 @@ import { MdOutlineDashboard } from "react-icons/md";
 import { GrAnalytics } from "react-icons/gr";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaBars, FaBarsStaggered } from "react-icons/fa6";
+import { FiLogOut } from "react-icons/fi"; // Import the logout icon
 import styles from "../scss/Sidebar.module.scss";
 
 const Sidebar = () => {
@@ -12,6 +13,14 @@ const Sidebar = () => {
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const handleLogout = () => {
+    // Clear user data from localStorage on logout
+    localStorage.removeItem("token");
+    localStorage.removeItem("UserId");
+    // You might want to redirect the user to the login page or another appropriate action
+    // Example: window.location.href = "/login";
   };
 
   return (
@@ -50,6 +59,15 @@ const Sidebar = () => {
           {isCollapsed ? null : "Settings"}
         </div>
       </nav>
+
+      {/* Logout Button */}
+      <div
+        className={`flex items-center justify-start py-4 px-6 hover:bg-gray-700 cursor-pointer ${styles.navItem}`}
+        onClick={handleLogout}
+      >
+        <FiLogOut className={`mr-2 ${styles.icon}`} />
+        {isCollapsed ? null : "Logout"}
+      </div>
     </div>
   );
 };
