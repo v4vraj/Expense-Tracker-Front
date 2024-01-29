@@ -1,11 +1,11 @@
-// Sidebar.jsx
-
+// Sidebar.js
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { MdOutlineDashboard } from "react-icons/md";
 import { GrAnalytics } from "react-icons/gr";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaBars, FaBarsStaggered } from "react-icons/fa6";
-import { FiLogOut } from "react-icons/fi"; // Import the logout icon
+import { FiLogOut } from "react-icons/fi";
 import styles from "../scss/Sidebar.module.scss";
 
 const Sidebar = () => {
@@ -16,11 +16,8 @@ const Sidebar = () => {
   };
 
   const handleLogout = () => {
-    // Clear user data from localStorage on logout
     localStorage.removeItem("token");
     localStorage.removeItem("UserId");
-    // You might want to redirect the user to the login page or another appropriate action
-    // Example: window.location.href = "/login";
   };
 
   return (
@@ -35,29 +32,35 @@ const Sidebar = () => {
         ) : (
           <h1 className="text-2xl font-bold flex items-center">
             <FaBarsStaggered className={`mr-2 cursor-pointer ${styles.icon}`} />
-            Expense Tracker
+            xpense Tracker
           </h1>
         )}
       </div>
       <nav className="mt-6">
-        <div
-          className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
-        >
-          <MdOutlineDashboard className={`mr-2 ${styles.icon}`} />
-          {isCollapsed ? null : "Dashboard"}
-        </div>
-        <div
-          className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
-        >
-          <GrAnalytics className={`mr-2 ${styles.icon}`} />
-          {isCollapsed ? null : "Analysis"}
-        </div>
-        <div
-          className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
-        >
-          <IoSettingsOutline className={`mr-2 ${styles.icon}`} />
-          {isCollapsed ? null : "Settings"}
-        </div>
+        <Link to="/dashboard" className={styles.navLink}>
+          <div
+            className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
+          >
+            <MdOutlineDashboard className={`mr-2 ${styles.icon}`} />
+            {isCollapsed ? null : "Dashboard"}
+          </div>
+        </Link>
+        <Link to="/analysis" className={styles.navLink}>
+          <div
+            className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
+          >
+            <GrAnalytics className={`mr-2 ${styles.icon}`} />
+            {isCollapsed ? null : "Analysis"}
+          </div>
+        </Link>
+        <Link to="/settings" className={styles.navLink}>
+          <div
+            className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
+          >
+            <IoSettingsOutline className={`mr-2 ${styles.icon}`} />
+            {isCollapsed ? null : "Settings"}
+          </div>
+        </Link>
       </nav>
 
       {/* Logout Button */}

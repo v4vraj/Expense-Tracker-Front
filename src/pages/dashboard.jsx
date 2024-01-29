@@ -4,276 +4,356 @@ import Sidebar from "../components/Sidebar";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import "../scss/Dashboard.scss";
 
+import DeleteModal from "../components/DeleteModal";
+import Modal from "../components/Modal";
+
+const BASE_URL = "http://localhost:3000/api";
+const EXPENSES_ENDPOINT = "/expenses";
+const INCOMES_ENDPOINT = "/incomes";
+
 export const Dashboard = () => {
   const [expenses, setExpenses] = useState([]);
   const [incomes, setIncomes] = useState([]);
   const [expenseData, setExpenseData] = useState({
     description: "",
     amount: 0,
+    status: false,
   });
-  const [incomeData, setIncomeData] = useState({
-    description: "",
-    amount: 0,
-  });
+  const [incomeData, setIncomeData] = useState({ description: "", amount: 0 });
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [selectedIncome, setSelectedIncome] = useState(null);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const openEditModal = (item, isIncome) => {
+    if (isIncome) {
+      setSelectedIncome(item);
+      setSelectedExpense(null); // Reset selectedExpense
+    } else {
+      setSelectedExpense(item);
+      setSelectedIncome(null); // Reset selectedIncome
+    }
+    setModalOpen(true);
+  };
+
+  const openDeleteModal = (item, isIncome) => {
+    isIncome ? setSelectedIncome(item) : setSelectedExpense(item);
+    setDeleteModalOpen(true);
+  };
 
   const userId = localStorage.getItem("UserId");
 
-  const addExpense = async () => {
+  const fetchData = async (endpoint, setData) => {
     try {
-      if (!userId || !expenseData.description || !expenseData.amount) {
-        console.error(
-          "User ID, description, and amount are required for expenses."
-        );
-        return;
-      }
+      const response = await axios.get(`${BASE_URL}${endpoint}`, {
+        params: { userId },
+      });
 
-      await axios.post("http://localhost:3000/api/expenses/addExpense", {
-        userId,
-        ...expenseData,
-      });
-      fetchExpenses();
-      setExpenseData({
-        description: "",
-        amount: 0,
-      });
-    } catch (error) {
-      if (error.response) {
-        console.error("Error adding expense", error.response.data);
+      if (endpoint.includes("/expenses")) {
+        setData(response.data.expenses);
+        console.log(response.data.expenses);
+      } else if (endpoint.includes("/incomes")) {
+        setData(response.data);
       } else {
-        console.error("Error adding expense", error.message);
+        // Handle other cases if needed
+        setData(response.data);
       }
+    } catch (error) {
+      console.error(`Error fetching data from ${endpoint}`, error);
     }
   };
 
-  const addIncome = async () => {
+  const handleEditSubmit = async (editedData, isIncome) => {
     try {
-      if (!userId || !incomeData.description || !incomeData.amount) {
+      const selectedItem = isIncome ? selectedIncome : selectedExpense;
+      if (!selectedItem) {
         console.error(
-          "UserId, Description, and amount are required for incomes."
+          `No ${isIncome ? "income" : "expense"} selected for editing`
         );
         return;
       }
 
-      await axios.post("http://localhost:3000/api/incomes/addIncome", {
-        userId,
-        ...incomeData,
-      });
-      fetchIncomes();
-      setIncomeData({
-        description: "",
-        amount: 0,
-      });
+      const endpoint = isIncome ? INCOMES_ENDPOINT : EXPENSES_ENDPOINT;
+      await axios.put(
+        `${BASE_URL}${endpoint}/update${isIncome ? "Income" : "Expense"}/${
+          selectedItem._id
+        }`,
+        editedData
+      );
+
+      console.log(`${isIncome ? "Income" : "Expense"} updated:`, editedData);
+      isIncome
+        ? fetchData(`${INCOMES_ENDPOINT}/getIncomes`, setIncomes)
+        : fetchData(`${EXPENSES_ENDPOINT}/getExpenses`, setExpenses);
     } catch (error) {
-      console.error("Error adding income", error.response.data);
+      console.error(`Error updating ${isIncome ? "income" : "expense"}`, error);
+    } finally {
+      setEditModalOpen(false);
     }
   };
 
-  const fetchExpenses = async () => {
+  const handleDeleteSubmit = async (deletedData, isIncome) => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/api/expenses/getExpenses",
-        { params: { userId } }
-      );
-      setExpenses(response.data);
-    } catch (error) {
-      console.error("Error fetching expenses", error);
-    }
-  };
+      const selectedItem = isIncome ? selectedIncome : selectedExpense;
+      if (!selectedItem) {
+        console.error(
+          `No ${isIncome ? "income" : "expense"} selected for deleting`
+        );
+        return;
+      }
 
-  const fetchIncomes = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:3000/api/incomes/getIncomes",
-        { params: { userId } }
+      const endpoint = isIncome ? INCOMES_ENDPOINT : EXPENSES_ENDPOINT;
+      await axios.delete(
+        `${BASE_URL}${endpoint}/delete${isIncome ? "Income" : "Expense"}/${
+          selectedItem._id
+        }`
       );
-      setIncomes(response.data);
+
+      console.log(`${isIncome ? "Income" : "Expense"} deleted:`, deletedData);
+      isIncome
+        ? fetchData(`${INCOMES_ENDPOINT}/getIncomes`, setIncomes)
+        : fetchData(`${EXPENSES_ENDPOINT}/getExpenses`, setExpenses);
     } catch (error) {
-      console.error("Error fetching incomes", error);
+      console.error(`Error deleting ${isIncome ? "income" : "expense"}`, error);
+    } finally {
+      setDeleteModalOpen(false);
     }
   };
 
   useEffect(() => {
-    fetchExpenses();
-    fetchIncomes();
+    fetchData(`${INCOMES_ENDPOINT}/getIncomes`, setIncomes);
+    fetchData(`${EXPENSES_ENDPOINT}/getExpenses`, setExpenses);
   }, []);
 
+  const handleInputChange = (e, setData) => {
+    const { name, value } = e.target;
+    setData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
   const handleExpenseChange = (e) => {
-    setExpenseData((prevData) => ({
-      ...prevData,
-      [e.target.name]: e.target.value,
-    }));
+    handleInputChange(e, setExpenseData);
   };
 
   const handleIncomeChange = (e) => {
-    setIncomeData({
-      ...incomeData,
-      [e.target.name]: e.target.value,
-    });
+    handleInputChange(e, setIncomeData);
   };
 
   const calculateTotal = (items) => {
     return items.reduce((total, item) => total + item.amount, 0);
   };
 
+  const addExpense = async () => {
+    try {
+      await axios.post(`${BASE_URL}${EXPENSES_ENDPOINT}/addExpense`, {
+        userId,
+        ...expenseData,
+      });
+      fetchData(`${EXPENSES_ENDPOINT}/getExpenses`, setExpenses);
+    } catch (error) {
+      console.error("Error adding expense", error);
+    }
+  };
+
+  const addIncome = async () => {
+    try {
+      await axios.post(`${BASE_URL}${INCOMES_ENDPOINT}/addIncome`, {
+        userId,
+        ...incomeData,
+      });
+      fetchData(`${INCOMES_ENDPOINT}/getIncomes`, setIncomes);
+    } catch (error) {
+      console.error("Error adding income", error);
+    }
+  };
+
   return (
-    <div className="flex h-screen">
-      <Sidebar />
-      <div className="flex-1 bg-gray-200 p-8 overflow-y-auto hide-scrollbar">
-        <h1 className="text-2xl font-bold mb-4">Main Content</h1>
-
-        {/* Display Cards */}
-        <div className="flex space-x-4 mb-4">
-          {/* Expense Card */}
-          <div className="flex-1 bg-white p-4 rounded-md shadow-md">
-            <h2 className="text-lg font-semibold mb-2">Expenses</h2>
-            {expenses.map((expense, index) => (
-              <div
-                key={index}
-                className="mb-4 border-b border-gray-300 pb-2 flex items-center justify-between"
-              >
-                <div>
-                  <p className="text-sm font-semibold">
-                    Description: {expense.description}
-                  </p>
-                  <p className="text-sm">Amount: {expense.amount}</p>
-                </div>
-                {/* Delete and Update Icons */}
-                <div className="flex items-center">
-                  <FaTrash className="text-red-500 cursor-pointer mr-2" />
-                  <FaEdit className="text-blue-500 cursor-pointer" />
-                </div>
+    <div className="flex-1 bg-gray-200 p-8 overflow-y-auto hide-scrollbar">
+      {/* Display Cards */}
+      <div className="flex space-x-4 mb-4">
+        {/* Expense Card */}
+        <div className="flex-1 bg-white p-4 rounded-md shadow-md">
+          <h2 className="text-lg font-semibold mb-2">Expenses</h2>
+          {expenses.map((item, index) => (
+            <div
+              key={index}
+              className="mb-4 border-b border-gray-300 pb-2 flex items-center justify-between"
+            >
+              <div>
+                <p className="text-sm font-semibold">
+                  Description: {item.description}
+                </p>
+                <p className="text-sm">Amount: {item.amount}</p>
+                <p className="text-sm font-semibold">
+                  Status: {item.status ? "Active" : "Inactive"}
+                </p>
               </div>
-            ))}
-          </div>
-
-          {/* Income Card */}
-          <div className="flex-1 bg-white p-4 rounded-md shadow-md">
-            <h2 className="text-lg font-semibold mb-2">Incomes</h2>
-            <ul>
-              {incomes.map((income, index) => (
-                <li
-                  key={index}
-                  className="mb-4 border-b border-gray-300 pb-2 flex items-center justify-between"
-                >
-                  <div>
-                    <p className="text-sm font-semibold">
-                      Description: {income.description}
-                    </p>
-                    <p className="text-sm">Amount: {income.amount}</p>
-                  </div>
-                  {/* Delete and Update Icons */}
-                  <div className="flex items-center">
-                    <FaTrash className="text-red-500 cursor-pointer mr-2" />
-                    <FaEdit className="text-blue-500 cursor-pointer" />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Total Card */}
-          <div className="flex-1 bg-white p-4 rounded-md shadow-md">
-            <h2 className="text-lg font-semibold mb-2">Total</h2>
-            <p className="text-sm">Total Income: {calculateTotal(incomes)}</p>
-            <p className="text-sm">Total Expense: {calculateTotal(expenses)}</p>
-            <p className="text-sm font-semibold">
-              Difference: {calculateTotal(incomes) - calculateTotal(expenses)}
-            </p>
-          </div>
+              {/* Delete and Update Icons */}
+              <div className="flex items-center">
+                <FaTrash
+                  className="text-red-500 cursor-pointer mr-2"
+                  onClick={() => openDeleteModal(item, false)}
+                />
+                <FaEdit
+                  className="text-blue-500 cursor-pointer"
+                  onClick={() => openEditModal(item, false)}
+                />
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div className="flex space-x-4 mb-4">
-          {/* Expense Form */}
-          <div className="flex-1 bg-white p-4 rounded-md shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Add Expense</h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                addExpense();
-              }}
-              className="flex flex-col space-y-4"
+        {/* Income Card */}
+        <div className="flex-1 bg-white p-4 rounded-md shadow-md">
+          <h2 className="text-lg font-semibold mb-2">Incomes</h2>
+          {incomes.map((item, index) => (
+            <div
+              key={index}
+              className="mb-4 border-b border-gray-300 pb-2 flex items-center justify-between"
             >
-              {/* Description Dropdown (replace with your actual options) */}
-              <label className="flex flex-col">
-                <span className="text-sm mb-1">Description:</span>
+              <div>
+                <p className="text-sm font-semibold">
+                  Description: {item.description}
+                </p>
+                <p className="text-sm">Amount: {item.amount}</p>
+              </div>
+              {/* Delete and Update Icons */}
+              <div className="flex items-center">
+                <FaTrash
+                  className="text-red-500 cursor-pointer mr-2"
+                  onClick={() => openDeleteModal(item, true)}
+                />
+                <FaEdit
+                  className="text-blue-500 cursor-pointer"
+                  onClick={() => openEditModal(item, true)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
 
-                <input
-                  type="text"
-                  name="description"
-                  value={expenseData.description}
-                  onChange={handleExpenseChange}
-                  className="border border-gray-300 p-2 rounded-md"
-                />
-              </label>
-              {/* Amount Input with adjusted width */}
-              <label className="flex flex-col">
-                <span className="text-sm mb-1">Amount:</span>
-                <input
-                  type="number"
-                  name="amount"
-                  value={expenseData.amount}
-                  onChange={handleExpenseChange}
-                  className="border border-gray-300 p-2 rounded-md"
-                />
-              </label>
-              {/* Submit Button with consistent styling */}
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all duration-300"
-              >
-                Add Expense
-              </button>
-            </form>
-          </div>
-
-          {/* Income Form */}
-          <div className="flex-1 bg-white p-4 rounded-md shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Add Income</h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                addIncome();
-              }}
-              className="flex flex-col space-y-4"
-            >
-              {/* Description Dropdown (replace with your actual options) */}
-              <label className="flex flex-col">
-                <span className="text-sm mb-1">Description:</span>
-
-                <input
-                  type="text"
-                  name="description"
-                  value={incomeData.description}
-                  onChange={handleIncomeChange}
-                  className="border border-gray-300 p-2 rounded-md"
-                />
-              </label>
-              {/* Amount Input with adjusted width */}
-              <label className="flex flex-col">
-                <span className="text-sm mb-1">Amount:</span>
-                <input
-                  type="number"
-                  name="amount"
-                  value={incomeData.amount}
-                  onChange={handleIncomeChange}
-                  className="border border-gray-300 p-2 rounded-md"
-                />
-              </label>
-              {/* Submit Button with consistent styling */}
-              <button
-                type="submit"
-                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-all duration-300"
-              >
-                Add Income
-              </button>
-            </form>
-          </div>
+        {/* Total Card */}
+        <div className="flex-1 bg-white p-4 rounded-md shadow-md">
+          <h2 className="text-lg font-semibold mb-2">Total</h2>
+          <p className="text-sm">Total Income: {calculateTotal(incomes)}</p>
+          <p className="text-sm">Total Expense: {calculateTotal(expenses)}</p>
+          <p className="text-sm font-semibold">
+            Difference: {calculateTotal(incomes) - calculateTotal(expenses)}
+          </p>
         </div>
       </div>
 
-      <div className="w-80 bg-white p-8">
-        <h2 className="text-lg font-semibold mb-4">To-Do List</h2>
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onSubmit={handleDeleteSubmit}
+        itemData={selectedExpense}
+        isIncome={false}
+      />
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleEditSubmit}
+        itemData={selectedIncome || selectedExpense}
+        isIncome={selectedIncome ? true : false}
+      />
+      <div className="flex space-x-4 mb-4">
+        {/* Expense Form */}
+        <div className="flex-1 bg-white p-4 rounded-md shadow-md">
+          <h2 className="text-lg font-semibold mb-4">Add Expense</h2>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              addExpense();
+            }}
+            className="flex flex-col space-y-4"
+          >
+            {/* Description Dropdown (replace with your actual options) */}
+            <label className="flex flex-col">
+              <span className="text-sm mb-1">Description:</span>
+              <input
+                type="text"
+                name="description"
+                value={expenseData.description}
+                onChange={handleExpenseChange}
+                className="border border-gray-300 p-2 rounded-md"
+              />
+            </label>
+            {/* Amount Input with adjusted width */}
+            <label className="flex flex-col">
+              <span className="text-sm mb-1">Amount:</span>
+              <input
+                type="number"
+                name="amount"
+                value={expenseData.amount}
+                onChange={handleExpenseChange}
+                className="border border-gray-300 p-2 rounded-md"
+              />
+            </label>
+            <label className="flex flex-col">
+              <span className="text-sm mb-1">Status:</span>
+              <input
+                type="text"
+                name="status"
+                value={expenseData.status}
+                onChange={handleExpenseChange}
+                className="border border-gray-300 p-2 rounded-md"
+              />
+            </label>
+            {/* Submit Button with consistent styling */}
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all duration-300"
+            >
+              Add Expense
+            </button>
+          </form>
+        </div>
+
+        {/* Income Form */}
+        <div className="flex-1 bg-white p-4 rounded-md shadow-md">
+          <h2 className="text-lg font-semibold mb-4">Add Income</h2>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              addIncome();
+            }}
+            className="flex flex-col space-y-4"
+          >
+            {/* Description Dropdown (replace with your actual options) */}
+            <label className="flex flex-col">
+              <span className="text-sm mb-1">Description:</span>
+              <input
+                type="text"
+                name="description"
+                value={incomeData.description}
+                onChange={handleIncomeChange}
+                className="border border-gray-300 p-2 rounded-md"
+              />
+            </label>
+            {/* Amount Input with adjusted width */}
+            <label className="flex flex-col">
+              <span className="text-sm mb-1">Amount:</span>
+              <input
+                type="number"
+                name="amount"
+                value={incomeData.amount}
+                onChange={handleIncomeChange}
+                className="border border-gray-300 p-2 rounded-md"
+              />
+            </label>
+            {/* Submit Button with consistent styling */}
+            <button
+              type="submit"
+              className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-all duration-300"
+            >
+              Add Income
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
 };
+
+export default Dashboard;
