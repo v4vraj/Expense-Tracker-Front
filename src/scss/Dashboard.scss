@@ -11,3 +11,18 @@
 .hide-scrollbar::-webkit-scrollbar-thumb {
   background-color: transparent;
 }
+
+.scrollable-card {
+  max-height: 300px; /* Set the maximum height for each card */
+  overflow-y: auto; /* Enable vertical scrolling for each card */
+}
+
+.sticky-heading {
+  position: -webkit-sticky;
+  position: sticky;
+  top: -16;
+  background-color: white; /* Adjust the background color as needed */
+  z-index: 100; /* Set a z-index value to ensure the heading appears above other elements */
+  padding: 25px;
+  margin: 0;
+}

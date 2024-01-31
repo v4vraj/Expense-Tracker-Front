@@ -16,23 +16,20 @@ const App = () => {
     <Router>
       <div className="flex h-screen">
         {/* Include Sidebar here so that it's present on all pages */}
-        <Sidebar />
+        {token ? <Sidebar /> : null}
 
         <Routes>
           <Route path="/login" element={<Login />} />
 
           {token ? (
             <>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/analysis" element={<Analysis />} />
               {/* Add more routes as needed */}
             </>
           ) : (
             <Route path="/*" element={<Navigate to="/login" replace />} />
           )}
-
-          {/* Add a default route for unmatched paths */}
-          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
     </Router>

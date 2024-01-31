@@ -17,7 +17,6 @@ export const Dashboard = () => {
   const [expenseData, setExpenseData] = useState({
     description: "",
     amount: 0,
-    status: false,
   });
   const [incomeData, setIncomeData] = useState({ description: "", amount: 0 });
   const [isEditModalOpen, setEditModalOpen] = useState(false);
@@ -51,8 +50,8 @@ export const Dashboard = () => {
       });
 
       if (endpoint.includes("/expenses")) {
-        setData(response.data.expenses);
-        console.log(response.data.expenses);
+        setData(response.data);
+        console.log(response.data);
       } else if (endpoint.includes("/incomes")) {
         setData(response.data);
       } else {
@@ -172,8 +171,10 @@ export const Dashboard = () => {
       {/* Display Cards */}
       <div className="flex space-x-4 mb-4">
         {/* Expense Card */}
-        <div className="flex-1 bg-white p-4 rounded-md shadow-md">
-          <h2 className="text-lg font-semibold mb-2">Expenses</h2>
+        <div className="flex-1 bg-white p-4 rounded-md shadow-md scrollable-card">
+          <h2 className="text-lg font-semibold mb-2 sticky-heading">
+            Expenses
+          </h2>
           {expenses.map((item, index) => (
             <div
               key={index}
@@ -184,9 +185,6 @@ export const Dashboard = () => {
                   Description: {item.description}
                 </p>
                 <p className="text-sm">Amount: {item.amount}</p>
-                <p className="text-sm font-semibold">
-                  Status: {item.status ? "Active" : "Inactive"}
-                </p>
               </div>
               {/* Delete and Update Icons */}
               <div className="flex items-center">
@@ -204,8 +202,8 @@ export const Dashboard = () => {
         </div>
 
         {/* Income Card */}
-        <div className="flex-1 bg-white p-4 rounded-md shadow-md">
-          <h2 className="text-lg font-semibold mb-2">Incomes</h2>
+        <div className="flex-1 bg-white p-4 rounded-md shadow-md scrollable-card">
+          <h2 className="text-lg font-semibold mb-2 sticky-heading">Incomes</h2>
           {incomes.map((item, index) => (
             <div
               key={index}
@@ -233,8 +231,8 @@ export const Dashboard = () => {
         </div>
 
         {/* Total Card */}
-        <div className="flex-1 bg-white p-4 rounded-md shadow-md">
-          <h2 className="text-lg font-semibold mb-2">Total</h2>
+        <div className="flex-1 bg-white p-4 rounded-md shadow-md scrollable-card">
+          <h2 className="text-lg font-semibold mb-2 sticky-heading">Total</h2>
           <p className="text-sm">Total Income: {calculateTotal(incomes)}</p>
           <p className="text-sm">Total Expense: {calculateTotal(expenses)}</p>
           <p className="text-sm font-semibold">
@@ -290,16 +288,7 @@ export const Dashboard = () => {
                 className="border border-gray-300 p-2 rounded-md"
               />
             </label>
-            <label className="flex flex-col">
-              <span className="text-sm mb-1">Status:</span>
-              <input
-                type="text"
-                name="status"
-                value={expenseData.status}
-                onChange={handleExpenseChange}
-                className="border border-gray-300 p-2 rounded-md"
-              />
-            </label>
+
             {/* Submit Button with consistent styling */}
             <button
               type="submit"
