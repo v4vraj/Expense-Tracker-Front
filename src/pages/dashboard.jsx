@@ -3,7 +3,10 @@ import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import "../scss/Dashboard.scss";
-
+import ReactToggle from "react-toggle";
+import "react-toggle/style.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import DeleteModal from "../components/DeleteModal";
 import Modal from "../components/Modal";
 
@@ -17,28 +20,54 @@ export const Dashboard = () => {
   const [expenseData, setExpenseData] = useState({
     description: "",
     amount: 0,
+    status: false, // Default status is false (off)
+    timestamp: new Date(),
   });
-  const [incomeData, setIncomeData] = useState({ description: "", amount: 0 });
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [incomeData, setIncomeData] = useState({
+    description: "",
+    amount: 0,
+    status: false, // Default status is false (off)
+    timestamp: new Date(),
+  });
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [selectedIncome, setSelectedIncome] = useState(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isFormDisabled, setFormDisabled] = useState(false);
 
   const openEditModal = (item, isIncome) => {
     if (isIncome) {
+      console.log(item);
       setSelectedIncome(item);
-      setSelectedExpense(null); // Reset selectedExpense
+      setSelectedExpense(null);
+      setFormDisabled(true);
     } else {
       setSelectedExpense(item);
-      setSelectedIncome(null); // Reset selectedIncome
+      setSelectedIncome(null);
+      setFormDisabled(true);
     }
     setModalOpen(true);
   };
 
   const openDeleteModal = (item, isIncome) => {
-    isIncome ? setSelectedIncome(item) : setSelectedExpense(item);
+    if (isIncome) {
+      setSelectedIncome(item);
+      setSelectedExpense(null);
+    } else {
+      setSelectedIncome(null);
+      setSelectedExpense(item);
+    }
     setDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setFormDisabled(false);
+  };
+
+  const closeEditModal = () => {
+    setModalOpen(false);
+    setFormDisabled(false); // Reset isFormDisabled when the modal is closed
   };
 
   const userId = localStorage.getItem("UserId");
@@ -51,7 +80,6 @@ export const Dashboard = () => {
 
       if (endpoint.includes("/expenses")) {
         setData(response.data);
-        console.log(response.data);
       } else if (endpoint.includes("/incomes")) {
         setData(response.data);
       } else {
@@ -88,13 +116,15 @@ export const Dashboard = () => {
     } catch (error) {
       console.error(`Error updating ${isIncome ? "income" : "expense"}`, error);
     } finally {
-      setEditModalOpen(false);
+      setModalOpen(false);
     }
   };
 
   const handleDeleteSubmit = async (deletedData, isIncome) => {
     try {
+      console.log("isIncome", isIncome);
       const selectedItem = isIncome ? selectedIncome : selectedExpense;
+      console.log(selectedItem);
       if (!selectedItem) {
         console.error(
           `No ${isIncome ? "income" : "expense"} selected for deleting`
@@ -123,7 +153,8 @@ export const Dashboard = () => {
   useEffect(() => {
     fetchData(`${INCOMES_ENDPOINT}/getIncomes`, setIncomes);
     fetchData(`${EXPENSES_ENDPOINT}/getExpenses`, setExpenses);
-  }, []);
+    setFormDisabled(false); // Reset formDisabled when component mounts or updates
+  }, [isDeleteModalOpen, isModalOpen]); // Add other dependencies as needed
 
   const handleInputChange = (e, setData) => {
     const { name, value } = e.target;
@@ -147,8 +178,15 @@ export const Dashboard = () => {
       await axios.post(`${BASE_URL}${EXPENSES_ENDPOINT}/addExpense`, {
         userId,
         ...expenseData,
+        timestamp: expenseData.timestamp.toISOString(),
       });
       fetchData(`${EXPENSES_ENDPOINT}/getExpenses`, setExpenses);
+      setExpenseData({
+        description: "",
+        amount: 0,
+        status: false, // Default status is false (off)
+        timestamp: new Date(),
+      });
     } catch (error) {
       console.error("Error adding expense", error);
     }
@@ -161,13 +199,19 @@ export const Dashboard = () => {
         ...incomeData,
       });
       fetchData(`${INCOMES_ENDPOINT}/getIncomes`, setIncomes);
+      setIncomeData({
+        description: "",
+        amount: 0,
+        status: false, // Default status is false (off)
+        timestamp: new Date(),
+      });
     } catch (error) {
       console.error("Error adding income", error);
     }
   };
 
   return (
-    <div className="flex-1 bg-gray-200 p-8 overflow-y-auto hide-scrollbar">
+    <div className="flex-1 bg-gray-200 p-8 overflow-y-auto hide-scrollbar ">
       {/* Display Cards */}
       <div className="flex space-x-4 mb-4">
         {/* Expense Card */}
@@ -185,6 +229,10 @@ export const Dashboard = () => {
                   Description: {item.description}
                 </p>
                 <p className="text-sm">Amount: {item.amount}</p>
+                <p className="text-sm">Timestamp: {item.timestamp}</p>
+                <p className="text-sm">
+                  Status: {item.status ? "Active" : "Inactive"}
+                </p>
               </div>
               {/* Delete and Update Icons */}
               <div className="flex items-center">
@@ -214,6 +262,10 @@ export const Dashboard = () => {
                   Description: {item.description}
                 </p>
                 <p className="text-sm">Amount: {item.amount}</p>
+                <p className="text-sm">Timestamp: {item.timestamp}</p>
+                <p className="text-sm">
+                  Status: {item.status ? "Active" : "Inactive"}
+                </p>
               </div>
               {/* Delete and Update Icons */}
               <div className="flex items-center">
@@ -243,21 +295,27 @@ export const Dashboard = () => {
 
       <DeleteModal
         isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onSubmit={handleDeleteSubmit}
-        itemData={selectedExpense}
-        isIncome={false}
+        onClose={closeDeleteModal}
+        onSubmit={() =>
+          handleDeleteSubmit(
+            selectedExpense || selectedIncome,
+            selectedIncome ? true : false
+          )
+        }
+        title={selectedIncome ? "Income" : "Expense"}
+        isIncome={selectedIncome ? true : false}
       />
+
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeEditModal}
         onSubmit={handleEditSubmit}
         itemData={selectedIncome || selectedExpense}
         isIncome={selectedIncome ? true : false}
       />
       <div className="flex space-x-4 mb-4">
         {/* Expense Form */}
-        <div className="flex-1 bg-white p-4 rounded-md shadow-md">
+        <div className="flex-1 bg-white p-4 rounded-md shadow-md ${isFormDisabled ? 'opacity-50' : ''}">
           <h2 className="text-lg font-semibold mb-4">Add Expense</h2>
           <form
             onSubmit={(e) => {
@@ -288,6 +346,43 @@ export const Dashboard = () => {
                 className="border border-gray-300 p-2 rounded-md"
               />
             </label>
+            <label style={{ display: "flex", alignItems: "center" }}>
+              <ReactToggle
+                id="statusToggle"
+                checked={expenseData.status}
+                onChange={() => {
+                  setExpenseData((prevData) => ({
+                    ...prevData,
+                    status: !prevData.status,
+                  }));
+                }}
+                disabled={isFormDisabled}
+              />
+              <span style={{ marginLeft: "8px" }}>
+                {expenseData.status ? "Active" : "Inactive"}
+              </span>
+            </label>
+
+            <label className="flex flex-col">
+              <span className="text-sm mb-1">Date:</span>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <DatePicker
+                  selected={expenseData.timestamp}
+                  onChange={(date) =>
+                    setExpenseData((prevData) => ({
+                      ...prevData,
+                      timestamp: date,
+                    }))
+                  }
+                  disabled={isFormDisabled}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="MMMM d, yyyy h:mm aa"
+                  className="border border-gray-300 p-2 rounded-md"
+                />
+              </div>
+            </label>
 
             {/* Submit Button with consistent styling */}
             <button
@@ -300,7 +395,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Income Form */}
-        <div className="flex-1 bg-white p-4 rounded-md shadow-md">
+        <div className="flex-1 bg-white p-4 rounded-md shadow-md ${isFormDisabled ? 'opacity-50' : ''}">
           <h2 className="text-lg font-semibold mb-4">Add Income</h2>
           <form
             onSubmit={(e) => {
@@ -330,6 +425,44 @@ export const Dashboard = () => {
                 onChange={handleIncomeChange}
                 className="border border-gray-300 p-2 rounded-md"
               />
+            </label>
+            <label style={{ display: "flex", alignItems: "center" }}>
+              <ReactToggle
+                id="statusToggle"
+                checked={incomeData.status}
+                onChange={() => {
+                  setIncomeData((prevData) => ({
+                    ...prevData,
+                    status: !prevData.status,
+                  }));
+                }}
+                disabled={isFormDisabled}
+              />
+              <span style={{ marginLeft: "8px" }}>
+                {incomeData.status ? "Active" : "Inactive"}
+              </span>
+            </label>
+
+            <label className="flex flex-col">
+              <span className="text-sm mb-1">Date:</span>
+
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <DatePicker
+                  selected={incomeData.timestamp}
+                  onChange={(date) =>
+                    setIncomeData((prevData) => ({
+                      ...prevData,
+                      timestamp: date,
+                    }))
+                  }
+                  disabled={isFormDisabled}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="MMMM d, yyyy h:mm aa"
+                  className="border border-gray-300 p-2 rounded-md"
+                />
+              </div>
             </label>
             {/* Submit Button with consistent styling */}
             <button

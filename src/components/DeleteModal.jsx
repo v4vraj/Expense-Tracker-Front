@@ -1,14 +1,14 @@
-// DeleteModal.jsx
+import PropTypes from "prop-types";
 
-import React from "react";
-
-const DeleteModal = ({ isOpen, onClose, onSubmit, title }) => {
+const DeleteModal = ({ isOpen, onClose, onSubmit, title, isIncome }) => {
   if (!isOpen) return null;
 
   const handleDelete = () => {
     // Add any additional logic before deleting, if needed
-    onSubmit();
+    console.log("Before onSubmit:", isIncome);
+    onSubmit(isIncome);
     onClose();
+    console.log("After onSubmit:", isIncome);
   };
 
   return (
@@ -38,6 +38,14 @@ const DeleteModal = ({ isOpen, onClose, onSubmit, title }) => {
       </div>
     </div>
   );
+};
+
+DeleteModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  title: PropTypes.string,
+  isIncome: PropTypes.bool,
 };
 
 export default DeleteModal;

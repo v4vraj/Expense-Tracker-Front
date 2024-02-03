@@ -57,9 +57,9 @@ export const Analysis = () => {
                 backgroundColor: Array.from(
                   { length: categories.length },
                   () =>
-                    `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
-                      Math.random() * 256
-                    )}, ${Math.floor(Math.random() * 256)}, 0.7)`
+                    `rgba(${Math.floor(Math.random() * 128)}, ${Math.floor(
+                      Math.random() * 128
+                    )}, ${Math.floor(Math.random() * 128)}, 0.7)`
                 ),
               },
             ],
@@ -136,9 +136,9 @@ export const Analysis = () => {
             backgroundColor: Array.from(
               { length: netCategories.length },
               () =>
-                `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
-                  Math.random() * 256
-                )}, ${Math.floor(Math.random() * 256)}, 0.7)`
+                `rgba(${Math.floor(Math.random() * 128)}, ${Math.floor(
+                  Math.random() * 128
+                )}, ${Math.floor(Math.random() * 128)}, 0.7)`
             ),
           },
         ],
@@ -172,14 +172,14 @@ export const Analysis = () => {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <div style={{ margin: "10px", display: "inline-block" }}>
-        <canvas ref={expensesChartRef} width="400px" height="400px"></canvas>
+      <div style={{ margin: "50px", display: "inline-block" }}>
+        <canvas ref={expensesChartRef} width="300px" height="300px"></canvas>
       </div>
-      <div style={{ margin: "10px", display: "inline-block" }}>
-        <canvas ref={incomesChartRef} width="400px" height="400px"></canvas>
+      <div style={{ margin: "50px", display: "inline-block" }}>
+        <canvas ref={incomesChartRef} width="300px" height="300px"></canvas>
       </div>
-      <div style={{ margin: "10px", display: "inline-block" }}>
-        <canvas ref={netChartRef} width="400px" height="400px"></canvas>
+      <div style={{ margin: "50px", display: "inline-block" }}>
+        <canvas ref={netChartRef} width="300px" height="300px"></canvas>
       </div>
     </div>
   );
