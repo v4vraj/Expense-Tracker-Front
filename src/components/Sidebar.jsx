@@ -6,6 +6,7 @@ import { GrAnalytics } from "react-icons/gr";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaBars, FaBarsStaggered } from "react-icons/fa6";
 import { FiLogOut } from "react-icons/fi";
+import { GiReceiveMoney } from "react-icons/gi";
 import styles from "../scss/Sidebar.module.scss";
 
 const Sidebar = () => {
@@ -51,6 +52,14 @@ const Sidebar = () => {
           >
             <GrAnalytics className={`mr-2 ${styles.icon}`} />
             {isCollapsed ? null : "Analysis"}
+          </div>
+        </Link>
+        <Link to="/budget" className={styles.navLink}>
+          <div
+            className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
+          >
+            <GiReceiveMoney className={`mr-2 ${styles.icon}`} />
+            {isCollapsed ? null : "Budget"}
           </div>
         </Link>
         <Link to="/settings" className={styles.navLink}>

@@ -41,7 +41,8 @@ export const Login = () => {
         password,
       });
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("UserId", response.data.UserId);
+      // console.log(response.data.user);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
       navigate("/");
     } catch (error) {
       console.log("Login Failed", error);

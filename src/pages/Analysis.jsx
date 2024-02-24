@@ -9,7 +9,8 @@ const INCOMES_ENDPOINT = "/incomes";
 export const Analysis = () => {
   const [expenses, setExpenses] = useState([]);
   const [incomes, setIncomes] = useState([]);
-  const userId = localStorage.getItem("UserId");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user._id;
   const expensesChartRef = useRef(null);
   const incomesChartRef = useRef(null);
   const netChartRef = useRef(null);

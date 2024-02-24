@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import { FaTrash, FaEdit } from "react-icons/fa";
+import { FcAlarmClock } from "react-icons/fc";
 import "../scss/Dashboard.scss";
 import ReactToggle from "react-toggle";
 import "react-toggle/style.css";
@@ -9,6 +10,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import DeleteModal from "../components/DeleteModal";
 import Modal from "../components/Modal";
+import DateModal from "../components/DateModal";
 
 const BASE_URL = "http://localhost:3000/api";
 const EXPENSES_ENDPOINT = "/expenses";
@@ -34,6 +36,8 @@ export const Dashboard = () => {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isFormDisabled, setFormDisabled] = useState(false);
+  const [isDateModalOpen, setDateModalOpen] = useState(false);
+  const [reminderDate, setReminderDate] = useState(new Date());
 
   const openEditModal = (item, isIncome) => {
     if (isIncome) {
@@ -53,16 +57,18 @@ export const Dashboard = () => {
     if (isIncome) {
       setSelectedIncome(item);
       setSelectedExpense(null);
+      setFormDisabled(true);
     } else {
       setSelectedIncome(null);
       setSelectedExpense(item);
+      setFormDisabled(true);
     }
     setDeleteModalOpen(true);
   };
 
   const closeDeleteModal = () => {
     setDeleteModalOpen(false);
-    setFormDisabled(false);
+    setFormDisabled(true);
   };
 
   const closeEditModal = () => {
@@ -70,7 +76,21 @@ export const Dashboard = () => {
     setFormDisabled(false); // Reset isFormDisabled when the modal is closed
   };
 
-  const userId = localStorage.getItem("UserId");
+  const closeDateModal = () => {
+    setDateModalOpen(false);
+    setFormDisabled(false);
+  };
+
+  const handleSelectExpense = (expense) => {
+    setSelectedExpense(expense);
+    // Other logic as needed
+    setDateModalOpen(true);
+    setFormDisabled(true);
+  };
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user._id;
+  const userEmail = user.email;
 
   const fetchData = async (endpoint, setData) => {
     try {
@@ -94,13 +114,14 @@ export const Dashboard = () => {
   const handleEditSubmit = async (editedData, isIncome) => {
     try {
       const selectedItem = isIncome ? selectedIncome : selectedExpense;
+      console.log("selectedItem---------", selectedIncome);
       if (!selectedItem) {
         console.error(
           `No ${isIncome ? "income" : "expense"} selected for editing`
         );
         return;
       }
-
+      console.log("selectedItem._id", selectedItem._id);
       const endpoint = isIncome ? INCOMES_ENDPOINT : EXPENSES_ENDPOINT;
       await axios.put(
         `${BASE_URL}${endpoint}/update${isIncome ? "Income" : "Expense"}/${
@@ -153,8 +174,7 @@ export const Dashboard = () => {
   useEffect(() => {
     fetchData(`${INCOMES_ENDPOINT}/getIncomes`, setIncomes);
     fetchData(`${EXPENSES_ENDPOINT}/getExpenses`, setExpenses);
-    setFormDisabled(false); // Reset formDisabled when component mounts or updates
-  }, [isDeleteModalOpen, isModalOpen]); // Add other dependencies as needed
+  }, []); // Add other dependencies as needed
 
   const handleInputChange = (e, setData) => {
     const { name, value } = e.target;
@@ -236,6 +256,10 @@ export const Dashboard = () => {
               </div>
               {/* Delete and Update Icons */}
               <div className="flex items-center">
+                <FcAlarmClock
+                  className="text-red-500 cursor-pointer mr-2"
+                  onClick={() => handleSelectExpense(item)}
+                />
                 <FaTrash
                   className="text-red-500 cursor-pointer mr-2"
                   onClick={() => openDeleteModal(item, false)}
@@ -313,9 +337,21 @@ export const Dashboard = () => {
         itemData={selectedIncome || selectedExpense}
         isIncome={selectedIncome ? true : false}
       />
+
+      <DateModal
+        isOpen={isDateModalOpen}
+        onClose={closeDateModal}
+        onSubmit={() => {
+          console.log("Reminder set for:", reminderDate);
+          setDateModalOpen(false);
+        }}
+        expenseTitle={selectedExpense ? selectedExpense.description : ""}
+        userEmail={userEmail}
+      />
+
       <div className="flex space-x-4 mb-4">
         {/* Expense Form */}
-        <div className="flex-1 bg-white p-4 rounded-md shadow-md ${isFormDisabled ? 'opacity-50' : ''}">
+        <div className={`flex-1 bg-white p-4 rounded-md shadow-md `}>
           <h2 className="text-lg font-semibold mb-4">Add Expense</h2>
           <form
             onSubmit={(e) => {
@@ -395,7 +431,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Income Form */}
-        <div className="flex-1 bg-white p-4 rounded-md shadow-md ${isFormDisabled ? 'opacity-50' : ''}">
+        <div className={`flex-1 bg-white p-4 rounded-md shadow-md `}>
           <h2 className="text-lg font-semibold mb-4">Add Income</h2>
           <form
             onSubmit={(e) => {
