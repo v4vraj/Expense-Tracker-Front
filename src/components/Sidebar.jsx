@@ -10,7 +10,7 @@ import { GiReceiveMoney } from "react-icons/gi";
 import styles from "../scss/Sidebar.module.scss";
 
 const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -46,14 +46,22 @@ const Sidebar = () => {
             {isCollapsed ? null : "Dashboard"}
           </div>
         </Link>
-        <Link to="/analysis" className={styles.navLink}>
+        <Link to="/Records" className={styles.navLink}>
+          <div
+            className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
+          >
+            <MdOutlineDashboard className={`mr-2 ${styles.icon}`} />
+            {isCollapsed ? null : "Records"}
+          </div>
+        </Link>
+        {/* <Link to="/analysis" className={styles.navLink}>
           <div
             className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
           >
             <GrAnalytics className={`mr-2 ${styles.icon}`} />
             {isCollapsed ? null : "Analysis"}
           </div>
-        </Link>
+        </Link> */}
         <Link to="/budget" className={styles.navLink}>
           <div
             className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}

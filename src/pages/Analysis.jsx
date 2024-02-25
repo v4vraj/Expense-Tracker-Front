@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Chart } from "chart.js/auto";
+import "../scss/Analysis.scss";
 
 const BASE_URL = "http://localhost:3000/api";
 const EXPENSES_ENDPOINT = "/expenses";
@@ -24,7 +25,6 @@ export const Analysis = () => {
         params: { userId },
       });
       setData(response.data);
-      console.log(`${endpoint} data:`, response.data);
     } catch (error) {
       console.error(`Error fetching ${endpoint} data`, error);
     }
@@ -171,16 +171,65 @@ export const Analysis = () => {
     });
   }, [expenses, incomes]);
 
+  const calculateTotal = (items) => {
+    return items.reduce((total, item) => total + item.amount, 0);
+  };
+
   return (
-    <div style={{ textAlign: "center" }}>
-      <div style={{ margin: "50px", display: "inline-block" }}>
-        <canvas ref={expensesChartRef} width="300px" height="300px"></canvas>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "20px",
+        padding: "20px",
+      }}
+    >
+      {/* Expense Box */}
+      <div className="chart-container">
+        <div className="chart-info">
+          <h2 className="text-lg font-semibold mb-2">Expenses</h2>
+          <p className="text-sm">
+            Total Amount: ${calculateTotal(expenses).toFixed(2)}
+          </p>
+        </div>
+        <div className="chart">
+          <canvas
+            ref={expensesChartRef}
+            style={{ width: "200px", height: "200px" }}
+          ></canvas>
+        </div>
       </div>
-      <div style={{ margin: "50px", display: "inline-block" }}>
-        <canvas ref={incomesChartRef} width="300px" height="300px"></canvas>
+
+      {/* Income Box */}
+      <div className="chart-container">
+        <div className="chart-info ">
+          <h2 className="text-lg font-semibold mb-2">Incomes</h2>
+          <p className="text-sm">
+            Total Amount: ${calculateTotal(incomes).toFixed(2)}
+          </p>
+        </div>
+        <div className="chart">
+          <canvas
+            ref={incomesChartRef}
+            style={{ width: "200px", height: "200px" }}
+          ></canvas>
+        </div>
       </div>
-      <div style={{ margin: "50px", display: "inline-block" }}>
-        <canvas ref={netChartRef} width="300px" height="300px"></canvas>
+
+      {/* Total Box */}
+      <div className="chart-container">
+        <div className="chart-info">
+          <h2 className="text-lg font-semibold mb-2">Total</h2>
+          <p className="text-sm">
+            Net Amount: ${calculateTotal(incomes) - calculateTotal(expenses)}
+          </p>
+        </div>
+        <div className="chart">
+          <canvas
+            ref={netChartRef}
+            style={{ width: "200px", height: "200px" }}
+          ></canvas>
+        </div>
       </div>
     </div>
   );

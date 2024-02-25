@@ -10,6 +10,7 @@ import Dashboard from "./pages/dashboard";
 import { Analysis } from "./pages/Analysis";
 import Sidebar from "./components/Sidebar"; // Import your Sidebar component
 import { Budget } from "./pages/Budget";
+import { NewDasboard } from "./pages/NewDashboard";
 
 const App = () => {
   const token = localStorage.getItem("token");
@@ -23,7 +24,8 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           {token ? (
             <>
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<NewDasboard />} />
+              <Route path="/Records" element={<Dashboard />} />
               <Route path="/analysis" element={<Analysis />} />
               <Route path="/budget" element={<Budget />} />
               {/* Add more routes as needed */}

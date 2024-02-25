@@ -68,7 +68,7 @@ export const Dashboard = () => {
 
   const closeDeleteModal = () => {
     setDeleteModalOpen(false);
-    setFormDisabled(true);
+    setFormDisabled(false);
   };
 
   const closeEditModal = () => {
@@ -78,7 +78,7 @@ export const Dashboard = () => {
 
   const closeDateModal = () => {
     setDateModalOpen(false);
-    setFormDisabled(false);
+    setFormDisabled(true);
   };
 
   const handleSelectExpense = (expense) => {
@@ -200,6 +200,7 @@ export const Dashboard = () => {
         ...expenseData,
         timestamp: expenseData.timestamp.toISOString(),
       });
+      console.log(expenseData);
       fetchData(`${EXPENSES_ENDPOINT}/getExpenses`, setExpenses);
       setExpenseData({
         description: "",
@@ -256,10 +257,6 @@ export const Dashboard = () => {
               </div>
               {/* Delete and Update Icons */}
               <div className="flex items-center">
-                <FcAlarmClock
-                  className="text-red-500 cursor-pointer mr-2"
-                  onClick={() => handleSelectExpense(item)}
-                />
                 <FaTrash
                   className="text-red-500 cursor-pointer mr-2"
                   onClick={() => openDeleteModal(item, false)}
@@ -336,17 +333,6 @@ export const Dashboard = () => {
         onSubmit={handleEditSubmit}
         itemData={selectedIncome || selectedExpense}
         isIncome={selectedIncome ? true : false}
-      />
-
-      <DateModal
-        isOpen={isDateModalOpen}
-        onClose={closeDateModal}
-        onSubmit={() => {
-          console.log("Reminder set for:", reminderDate);
-          setDateModalOpen(false);
-        }}
-        expenseTitle={selectedExpense ? selectedExpense.description : ""}
-        userEmail={userEmail}
       />
 
       <div className="flex space-x-4 mb-4">
