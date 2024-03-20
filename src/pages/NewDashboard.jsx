@@ -38,10 +38,6 @@ export const NewDasboard = () => {
     }
   };
 
-  const calculateTotal = (items) => {
-    return items.reduce((total, item) => total + item.amount, 0);
-  };
-
   useEffect(() => {
     // Fetch expenses and budgets when the component mounts
     fetchWeeklyExpenses();
@@ -52,7 +48,9 @@ export const NewDasboard = () => {
 
   const fetchWeeklyExpenses = async () => {
     try {
-      const response = await axios.get("/api/weeklyBudget/getWeeklyBudgets");
+      const response = await axios.get("/api/weeklyBudget/getWeeklyBudgets", {
+        params: { userId },
+      });
       setWeeklyExpenses(response.data);
     } catch (error) {
       console.error("Error fetching weekly expenses:", error);
@@ -61,13 +59,14 @@ export const NewDasboard = () => {
 
   const fetchMonthlyBudgets = async () => {
     try {
-      const response = await axios.get("/api/monthlyBudget/getMonthlyBudgets");
+      const response = await axios.get("/api/monthlyBudget/getMonthlyBudgets", {
+        params: { userId },
+      });
       setMonthlyBudgets(response.data);
     } catch (error) {
       console.error("Error fetching monthly budgets:", error);
     }
   };
-
   const handleTabChange = (selectedTab) => {
     setTab(selectedTab);
   };

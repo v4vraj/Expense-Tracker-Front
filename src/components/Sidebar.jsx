@@ -1,25 +1,42 @@
 // Sidebar.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MdOutlineDashboard } from "react-icons/md";
 import { GrAnalytics } from "react-icons/gr";
+import { FaSlideshare } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaBars, FaBarsStaggered } from "react-icons/fa6";
 import { FiLogOut } from "react-icons/fi";
 import { GiReceiveMoney } from "react-icons/gi";
 import styles from "../scss/Sidebar.module.scss";
+import axios from "axios";
 
 const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [groups, setGroups] = useState([]);
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   };
+  const AplhaUser = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("UserId");
   };
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const response = await axios.get("/api/groups/getGroups"); // Adjust the API endpoint
+        console.log(response.data);
+        setGroups(response.data);
+      } catch (error) {
+        console.error("Error fetching groups:", error);
+      }
+    };
+
+    fetchGroups();
+  }, []);
 
   return (
     <div
@@ -70,6 +87,37 @@ const Sidebar = () => {
             {isCollapsed ? null : "Budget"}
           </div>
         </Link>
+        <Link to="/splitwise" className={styles.navLink}>
+          <div
+            className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
+          >
+            <FaSlideshare className={`mr-2 ${styles.icon}`} />
+            {isCollapsed ? null : "Splitwise"}
+          </div>
+        </Link>
+        {groups.map((group) => {
+          // console.log(user.email);
+          const userIsInGroup = group.users.some(
+            (user) => user.email === AplhaUser.email
+          );
+          // console.log(userIsInGroup);
+          // Render the link only if the user is in the group
+          return userIsInGroup ? (
+            <Link
+              to={`/group/${group.code}`}
+              className={styles.navLink}
+              key={group.code}
+            >
+              <div
+                className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
+              >
+                <MdOutlineDashboard className={`mr-2 ${styles.icon}`} />
+                {!isCollapsed && `Group ${group.code}`}
+              </div>
+            </Link>
+          ) : null;
+        })}
+
         <Link to="/settings" className={styles.navLink}>
           <div
             className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}

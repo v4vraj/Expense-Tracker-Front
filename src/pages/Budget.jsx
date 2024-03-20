@@ -21,6 +21,9 @@ export const Budget = () => {
   const [weeklyExpenses, setWeeklyExpenses] = useState([]);
   const [monthlyBudgets, setMonthlyBudgets] = useState([]);
 
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user._id;
+
   useEffect(() => {
     // Fetch expenses and budgets when the component mounts
     fetchWeeklyExpenses();
@@ -29,7 +32,9 @@ export const Budget = () => {
 
   const fetchWeeklyExpenses = async () => {
     try {
-      const response = await axios.get("/api/weeklyBudget/getWeeklyBudgets");
+      const response = await axios.get("/api/weeklyBudget/getWeeklyBudgets", {
+        params: { userId },
+      });
       setWeeklyExpenses(response.data);
     } catch (error) {
       console.error("Error fetching weekly expenses:", error);
@@ -38,7 +43,9 @@ export const Budget = () => {
 
   const fetchMonthlyBudgets = async () => {
     try {
-      const response = await axios.get("/api/monthlyBudget/getMonthlyBudgets");
+      const response = await axios.get("/api/monthlyBudget/getMonthlyBudgets", {
+        params: { userId },
+      });
       setMonthlyBudgets(response.data);
     } catch (error) {
       console.error("Error fetching monthly budgets:", error);
@@ -121,6 +128,7 @@ export const Budget = () => {
       );
 
       const newBudget = {
+        userId,
         startDate,
         endDate,
         budgetAmount: weeklyValues.budgetAmount,
@@ -149,6 +157,7 @@ export const Budget = () => {
   const handleMonthlySubmit = async () => {
     try {
       const newBudget = {
+        userId,
         month: monthlyValues.month,
         year: monthlyValues.year,
         budgetAmount: monthlyValues.budgetAmount,

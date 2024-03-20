@@ -1,0 +1,50 @@
+// Splitwise.scss
+
+.splitwise-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; // Center the content vertically
+
+  .splitwise-box {
+    width: 300px; // Set a fixed width for the box
+    border: 1px solid #ccc;
+    padding: 20px;
+    text-align: center;
+    background-color: #f4f4f4;
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        margin-bottom: 10px;
+      }
+
+      input {
+        padding: 8px;
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 10px;
+        background-color: #28a745;
+        color: #fff;
+        cursor: pointer;
+        border: none;
+      }
+    }
+  }
+}
