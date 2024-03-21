@@ -13,6 +13,7 @@ export const Group = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [balances, setBalances] = useState(null);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handlePaidByChange = (e) => {
     setPaidBy(e.target.value);
@@ -60,13 +61,16 @@ export const Group = () => {
         setGroup(groupResponse.data);
         setAvailableUsers(groupResponse.data.users);
         console.log(groupResponse.data._id);
+
         // Fetch user balances
         const groupId = groupResponse.data._id;
+        const userEmail = user.email; // Replace this with the appropriate way to get the user's email
         const balancesResponse = await axios.get(
-          `/api/groupTransaction/balances/${groupId}`
+          `/api/groupTransaction/balances/${groupId}`,
+          { params: { userEmail } } // Pass user email as a query parameter
         );
-        setBalances(balancesResponse.data.balances);
-
+        setBalances(balancesResponse.data);
+        console.log(balancesResponse.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching group and balances:", error);
@@ -84,6 +88,49 @@ export const Group = () => {
   return (
     <div className="bg-gray-200 p-8 overflow-y-auto" style={{ width: "100%" }}>
       <h3 className="text-lg font-semibold mb-4">Group {group.groupName}</h3>
+      {balances && (
+        <div
+          className="mt-4 bg-gray-100 p-4 rounded-md"
+          style={{ width: "fit-content" }}
+        >
+          <h3 className="text-lg font-semibold mb-4">User Balances</h3>
+          <div className="mb-4">
+            <p>
+              <span
+                className={`font-semibold ${
+                  balances.totalBalance < 0 ? "text-red-600" : "text-green-600"
+                }`}
+              >
+                {balances.totalBalance < 0
+                  ? "You owe Balance"
+                  : "You are owed Balance"}{" "}
+                {balances.totalBalance}
+              </span>
+            </p>
+          </div>
+          <div className="mb-4">
+            <p className="mb-1"></p>
+            <ul>
+              {balances.owes.map((user) => (
+                <li key={user.user} className="flex items-center">
+                  <span className="mr-2">You owe from {user.user}:</span>{" "}
+                  <span className="text-red-600">{user.amount}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <ul>
+              {balances.owedFrom.map((user) => (
+                <li key={user.user} className="flex items-center">
+                  <span className="mr-2">{user.user} owes you:</span>{" "}
+                  <span className="text-green-600">{user.amount}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
       <div
         className="flex-1 bg-white p-4 rounded-md shadow-md "
         style={{ width: "50%" }}
@@ -175,18 +222,6 @@ export const Group = () => {
           </div>
         </form>
       </div>
-      {balances && (
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold mb-4">User Balances</h3>
-          <ul>
-            {balances.map((balance) => (
-              <li key={balance.user}>
-                {balance.user}: {balance.balance}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 };
