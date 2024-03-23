@@ -22,13 +22,13 @@ export const Dashboard = () => {
   const [expenseData, setExpenseData] = useState({
     description: "",
     amount: 0,
-    status: false, // Default status is false (off)
+    status: false,
     timestamp: new Date(),
   });
   const [incomeData, setIncomeData] = useState({
     description: "",
     amount: 0,
-    status: false, // Default status is false (off)
+    status: false,
     timestamp: new Date(),
   });
   const [selectedExpense, setSelectedExpense] = useState(null);
@@ -73,7 +73,7 @@ export const Dashboard = () => {
 
   const closeEditModal = () => {
     setModalOpen(false);
-    setFormDisabled(false); // Reset isFormDisabled when the modal is closed
+    setFormDisabled(false);
   };
 
   const closeDateModal = () => {
@@ -83,7 +83,6 @@ export const Dashboard = () => {
 
   const handleSelectExpense = (expense) => {
     setSelectedExpense(expense);
-    // Other logic as needed
     setDateModalOpen(true);
     setFormDisabled(true);
   };
@@ -103,7 +102,6 @@ export const Dashboard = () => {
       } else if (endpoint.includes("/incomes")) {
         setData(response.data);
       } else {
-        // Handle other cases if needed
         setData(response.data);
       }
     } catch (error) {
@@ -174,7 +172,7 @@ export const Dashboard = () => {
   useEffect(() => {
     fetchData(`${INCOMES_ENDPOINT}/getIncomes`, setIncomes);
     fetchData(`${EXPENSES_ENDPOINT}/getExpenses`, setExpenses);
-  }, []); // Add other dependencies as needed
+  }, []);
 
   const handleInputChange = (e, setData) => {
     const { name, value } = e.target;
@@ -205,7 +203,7 @@ export const Dashboard = () => {
       setExpenseData({
         description: "",
         amount: 0,
-        status: false, // Default status is false (off)
+        status: false,
         timestamp: new Date(),
       });
     } catch (error) {
@@ -223,7 +221,7 @@ export const Dashboard = () => {
       setIncomeData({
         description: "",
         amount: 0,
-        status: false, // Default status is false (off)
+        status: false,
         timestamp: new Date(),
       });
     } catch (error) {
@@ -233,9 +231,7 @@ export const Dashboard = () => {
 
   return (
     <div className="flex-1 bg-gray-200 p-8 overflow-y-auto hide-scrollbar ">
-      {/* Display Cards */}
       <div className="flex space-x-4 mb-4">
-        {/* Expense Card */}
         <div className="flex-1 bg-white p-4 rounded-md shadow-md scrollable-card">
           <h2 className="text-lg font-semibold mb-2 sticky-heading">
             Expenses
@@ -255,7 +251,6 @@ export const Dashboard = () => {
                   Status: {item.status ? "Active" : "Inactive"}
                 </p>
               </div>
-              {/* Delete and Update Icons */}
               <div className="flex items-center">
                 <FaTrash
                   className="text-red-500 cursor-pointer mr-2"
@@ -270,7 +265,6 @@ export const Dashboard = () => {
           ))}
         </div>
 
-        {/* Income Card */}
         <div className="flex-1 bg-white p-4 rounded-md shadow-md scrollable-card">
           <h2 className="text-lg font-semibold mb-2 sticky-heading">Incomes</h2>
           {incomes.map((item, index) => (
@@ -288,7 +282,6 @@ export const Dashboard = () => {
                   Status: {item.status ? "Active" : "Inactive"}
                 </p>
               </div>
-              {/* Delete and Update Icons */}
               <div className="flex items-center">
                 <FaTrash
                   className="text-red-500 cursor-pointer mr-2"
@@ -303,7 +296,6 @@ export const Dashboard = () => {
           ))}
         </div>
 
-        {/* Total Card */}
         <div className="flex-1 bg-white p-4 rounded-md shadow-md scrollable-card">
           <h2 className="text-lg font-semibold mb-2 sticky-heading">Total</h2>
           <p className="text-sm">Total Income: {calculateTotal(incomes)}</p>
@@ -336,7 +328,6 @@ export const Dashboard = () => {
       />
 
       <div className="flex space-x-4 mb-4">
-        {/* Expense Form */}
         <div className={`flex-1 bg-white p-4 rounded-md shadow-md `}>
           <h2 className="text-lg font-semibold mb-4">Add Expense</h2>
           <form
@@ -346,7 +337,6 @@ export const Dashboard = () => {
             }}
             className="flex flex-col space-y-4"
           >
-            {/* Description Dropdown (replace with your actual options) */}
             <label className="flex flex-col">
               <span className="text-sm mb-1">Description:</span>
               <input
@@ -357,7 +347,6 @@ export const Dashboard = () => {
                 className="border border-gray-300 p-2 rounded-md"
               />
             </label>
-            {/* Amount Input with adjusted width */}
             <label className="flex flex-col">
               <span className="text-sm mb-1">Amount:</span>
               <input
@@ -406,7 +395,6 @@ export const Dashboard = () => {
               </div>
             </label>
 
-            {/* Submit Button with consistent styling */}
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all duration-300"
@@ -416,7 +404,6 @@ export const Dashboard = () => {
           </form>
         </div>
 
-        {/* Income Form */}
         <div className={`flex-1 bg-white p-4 rounded-md shadow-md `}>
           <h2 className="text-lg font-semibold mb-4">Add Income</h2>
           <form
@@ -426,7 +413,6 @@ export const Dashboard = () => {
             }}
             className="flex flex-col space-y-4"
           >
-            {/* Description Dropdown (replace with your actual options) */}
             <label className="flex flex-col">
               <span className="text-sm mb-1">Description:</span>
               <input
@@ -437,7 +423,6 @@ export const Dashboard = () => {
                 className="border border-gray-300 p-2 rounded-md"
               />
             </label>
-            {/* Amount Input with adjusted width */}
             <label className="flex flex-col">
               <span className="text-sm mb-1">Amount:</span>
               <input
@@ -486,7 +471,6 @@ export const Dashboard = () => {
                 />
               </div>
             </label>
-            {/* Submit Button with consistent styling */}
             <button
               type="submit"
               className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-all duration-300"

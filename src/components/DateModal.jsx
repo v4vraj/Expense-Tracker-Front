@@ -1,5 +1,3 @@
-// DateModal.js
-
 import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -26,17 +24,14 @@ const DateModal = ({ isOpen, onClose, onSubmit, expenseTitle, userEmail }) => {
 
       if (response.ok) {
         console.log("Reminder set successfully!");
-        // Invoke onSubmit when the reminder is set successfully
         onSubmit();
       } else {
         console.error("Failed to set reminder");
-        // Handle failure if needed
       }
     } catch (error) {
       console.error("Error setting reminder:", error);
     }
 
-    // Close the modal after setting the reminder
     onClose();
   };
 

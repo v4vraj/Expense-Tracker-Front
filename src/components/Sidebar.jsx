@@ -1,4 +1,3 @@
-// Sidebar.js
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MdOutlineDashboard } from "react-icons/md";
@@ -27,7 +26,7 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const response = await axios.get("/api/groups/getGroups"); // Adjust the API endpoint
+        const response = await axios.get("/api/groups/getGroups");
         console.log(response.data);
         setGroups(response.data);
       } catch (error) {
@@ -118,17 +117,16 @@ const Sidebar = () => {
           ) : null;
         })}
 
-        <Link to="/settings" className={styles.navLink}>
+        {/* <Link to="/settings" className={styles.navLink}>
           <div
             className={`flex items-center py-4 px-6 hover:bg-gray-700 ${styles.navItem}`}
           >
             <IoSettingsOutline className={`mr-2 ${styles.icon}`} />
             {isCollapsed ? null : "Settings"}
           </div>
-        </Link>
+        </Link> */}
       </nav>
 
-      {/* Logout Button */}
       <div
         className={`flex items-center justify-start py-4 px-6 hover:bg-gray-700 cursor-pointer ${styles.navItem}`}
         onClick={handleLogout}

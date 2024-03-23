@@ -4,7 +4,6 @@ const DeleteModal = ({ isOpen, onClose, onSubmit, title, isIncome }) => {
   if (!isOpen) return null;
 
   const handleDelete = () => {
-    // Add any additional logic before deleting, if needed
     console.log("Before onSubmit:", isIncome);
     onSubmit(isIncome);
     onClose();

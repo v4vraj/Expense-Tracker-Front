@@ -41,12 +41,10 @@ export const Analysis = () => {
         const categories = data.map((item) => item.description);
         const amounts = data.map((item) => item.amount);
 
-        // Destroy the existing Chart instance if it exists
         if (chartInstance.current) {
           chartInstance.current.destroy();
         }
 
-        // Create a new doughnut chart
         const ctx = chartRef.current.getContext("2d");
         chartInstance.current = new Chart(ctx, {
           type: "doughnut",
@@ -106,7 +104,6 @@ export const Analysis = () => {
       "Income Distribution"
     );
 
-    // Calculate net income (income - expenses)
     const netAmount = incomes.reduce(
       (totalIncome, income) => totalIncome + income.amount,
       0
@@ -120,12 +117,10 @@ export const Analysis = () => {
     const netCategories = ["Income", "Expenses"];
     const netAmounts = [netAmount, -netExpense];
 
-    // Destroy the existing Net Chart instance if it exists
     if (netChartInstance.current) {
       netChartInstance.current.destroy();
     }
 
-    // Create a new doughnut chart for Net Income
     const netCtx = netChartRef.current.getContext("2d");
     netChartInstance.current = new Chart(netCtx, {
       type: "doughnut",
@@ -184,7 +179,6 @@ export const Analysis = () => {
         padding: "20px",
       }}
     >
-      {/* Expense Box */}
       <div className="chart-container">
         <div className="chart-info">
           <h2 className="text-lg font-semibold mb-2">Expenses</h2>
@@ -200,7 +194,6 @@ export const Analysis = () => {
         </div>
       </div>
 
-      {/* Income Box */}
       <div className="chart-container">
         <div className="chart-info ">
           <h2 className="text-lg font-semibold mb-2">Incomes</h2>
@@ -216,7 +209,6 @@ export const Analysis = () => {
         </div>
       </div>
 
-      {/* Total Box */}
       <div className="chart-container">
         <div className="chart-info">
           <h2 className="text-lg font-semibold mb-2">Total</h2>

@@ -1,28 +1,26 @@
-/* Add this to your CSS */
 .hide-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
-}
 
-.hide-scrollbar::-webkit-scrollbar {
-  width: 5px;
-}
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
 
-.hide-scrollbar::-webkit-scrollbar-thumb {
-  background-color: transparent;
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent;
+  }
 }
 
 .scrollable-card {
-  max-height: 300px; /* Set the maximum height for each card */
-  overflow-y: auto; /* Enable vertical scrolling for each card */
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .sticky-heading {
   position: -webkit-sticky;
   position: sticky;
-  top: -16;
-  background-color: white; /* Adjust the background color as needed */
-
+  top: -16px;
+  background-color: white;
   padding: 25px;
   margin: 0;
 }

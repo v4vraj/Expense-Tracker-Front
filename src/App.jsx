@@ -12,7 +12,6 @@ import Sidebar from "./components/Sidebar";
 import { Budget } from "./pages/Budget";
 import { NewDasboard } from "./pages/NewDashboard";
 import { Splitwise } from "./pages/Splitwise";
-// import GroupExpenses from "./pages/GroupExpenses";
 import io from "socket.io-client";
 import { Group } from "./pages/Group";
 
@@ -21,11 +20,9 @@ const App = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    // Replace "http://localhost:3000" with your server URL
     const socketInstance = io("http://localhost:3000");
     setSocket(socketInstance);
 
-    // Cleanup function to close the socket connection when the component unmounts
     return () => {
       if (socketInstance) {
         socketInstance.disconnect();
@@ -45,7 +42,6 @@ const App = () => {
               <Route path="/Records" element={<Dashboard />} />
               <Route path="/analysis" element={<Analysis />} />
               <Route path="/budget" element={<Budget />} />
-              {/* Pass the socket instance to the Splitwise and GroupExpenses components */}
               <Route
                 path="/splitwise"
                 element={<Splitwise socket={socket} />}

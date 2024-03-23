@@ -1,8 +1,8 @@
 .scrollable-card {
   overflow: auto;
-  max-height: 400px; /* Set a maximum height if needed */
+  max-height: 400px;
   scrollbar-width: thin;
-  scrollbar-color: #718096 #e2e8f0; /* Change colors as needed */
+  scrollbar-color: #718096 #e2e8f0;
 
   &::-webkit-scrollbar {
     width: 8px;

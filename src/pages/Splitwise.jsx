@@ -3,10 +3,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import GroupExpenses from "./GroupExpenses"; // Make sure to import the GroupExpenses component
 import "../scss/Splitwise.scss";
 
-const socket = io("http://localhost:3000"); // Replace with your server URL
+const socket = io("http://localhost:3000");
 
 export const Splitwise = () => {
   const [groupCode, setGroupCode] = useState("");
@@ -34,10 +33,9 @@ export const Splitwise = () => {
   }, [navigate]);
 
   const generateRandomCode = () => {
-    const min = 100000; // Minimum value for a 6-digit number
-    const max = 999999; // Maximum value for a 6-digit number
+    const min = 100000;
+    const max = 999999;
 
-    // Generate a random number between min and max (inclusive)
     const randomCode = Math.floor(Math.random() * (max - min + 1)) + min;
 
     return randomCode;
@@ -84,9 +82,8 @@ export const Splitwise = () => {
       });
 
       if (response.status === 200) {
-        const { users } = response.data; // Assuming the response includes the 'users' array
+        const { users } = response.data;
 
-        // Find the user object in the 'users' array based on userId
         const joinedUser = users.find((user) => user.userId === userId);
 
         if (joinedUser) {
@@ -110,10 +107,6 @@ export const Splitwise = () => {
   const joinGroup = (code) => {
     console.log(`User joined group with code: ${code}`);
   };
-
-  if (groupCode) {
-    return <GroupExpenses groupCode={groupCode} socket={socket} />;
-  }
 
   return (
     <div className="flex items-center justify-center h-screen mx-auto">

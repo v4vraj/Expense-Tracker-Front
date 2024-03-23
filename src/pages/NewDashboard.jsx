@@ -39,7 +39,6 @@ export const NewDasboard = () => {
   };
 
   useEffect(() => {
-    // Fetch expenses and budgets when the component mounts
     fetchWeeklyExpenses();
     fetchMonthlyBudgets();
     fetchExpenses();
@@ -233,7 +232,6 @@ export const NewDasboard = () => {
     >
       <Analysis />
 
-      {/* Budgets Section */}
       <div className="box-section">
         <h2 className="text-2xl font-semibold mb-4">Budgets</h2>
         <div className="flex space-x-4 justify-end mb-4">
@@ -279,7 +277,7 @@ export const NewDasboard = () => {
                       <p className="text-sm mb-2">
                         Budget Amount: {item.budgetAmount}
                       </p>
-                      {/* Render Expenses within the Weekly Budget Card */}
+
                       <div className="mt-2">
                         {item.expenses.map((expense, expenseIndex) => (
                           <div
@@ -311,7 +309,7 @@ export const NewDasboard = () => {
                       <p className="text-sm mb-2">
                         Total Expenses: {budget.expenses.length}
                       </p>
-                      {/* Render Expenses within the Monthly Budget Card */}
+
                       <div className="mt-2">
                         {budget.expenses.map((expense, expenseIndex) => (
                           <div
@@ -334,7 +332,6 @@ export const NewDasboard = () => {
         </div>
       </div>
 
-      {/* Expenses Section */}
       <div className="box-section">
         <h2 className="text-2xl font-semibold mb-4">Expenses</h2>
         <div className="flex space-x-4 justify-end mb-4">
@@ -416,7 +413,6 @@ export const NewDasboard = () => {
         </div>
       </div>
 
-      {/* Incomes Section */}
       <div className="box-section">
         <h2 className="text-2xl font-semibold mb-4">Incomes</h2>
         <div className="flex space-x-4 justify-end mb-4">

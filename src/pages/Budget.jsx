@@ -25,7 +25,6 @@ export const Budget = () => {
   const userId = user._id;
 
   useEffect(() => {
-    // Fetch expenses and budgets when the component mounts
     fetchWeeklyExpenses();
     fetchMonthlyBudgets();
   }, []);
@@ -82,11 +81,9 @@ export const Budget = () => {
   const handleWeekDateChange = (date) => {
     console.log("Week Date ----", date);
     setStartDateForWeek(date);
-    // Additional logic for updating other date-related state if needed
   };
 
   const handleAddWeeklyExpense = () => {
-    // Add a new empty expense field for weekly budget
     setWeeklyValues((prevValues) => {
       return {
         ...prevValues,
@@ -96,7 +93,6 @@ export const Budget = () => {
   };
 
   const handleAddMonthlyExpense = () => {
-    // Add a new empty expense field for monthly budget
     setMonthlyValues((prevValues) => {
       return {
         ...prevValues,
@@ -111,7 +107,7 @@ export const Budget = () => {
       console.log(startDateForWeek);
       const startDate = startDateForWeek;
       const endDate = new Date(startDateForWeek);
-      endDate.setDate(endDate.getDate() + 6); // Set to an empty string if not provided
+      endDate.setDate(endDate.getDate() + 6);
       const monthForWeek = startDateForWeek
         ? startDateForWeek.toLocaleString("default", { month: "long" })
         : "";
@@ -139,7 +135,6 @@ export const Budget = () => {
 
       await axios.post("/api/weeklyBudget/addWeeklyBudget", newBudget);
 
-      // Clear input fields after submission
       setWeeklyValues((prevValues) => ({
         ...prevValues,
         startDate: "",
@@ -147,7 +142,6 @@ export const Budget = () => {
         expenses: [{ description: "", amount: "" }],
       }));
 
-      // // Refetch data after submission
       fetchWeeklyExpenses();
     } catch (error) {
       console.error("Error submitting weekly budget:", error);
@@ -166,7 +160,6 @@ export const Budget = () => {
 
       await axios.post("/api/monthlyBudget/addMonthlyBudget", newBudget);
 
-      // Clear input fields after submission
       setMonthlyValues({
         month: "",
         year: "",
@@ -174,7 +167,6 @@ export const Budget = () => {
         expenses: [{ description: "", amount: "" }],
       });
 
-      // Refetch data after submission
       fetchMonthlyBudgets();
     } catch (error) {
       console.error("Error submitting monthly budget:", error);
@@ -244,7 +236,6 @@ export const Budget = () => {
                 className="border border-gray-300 p-2 mb-2 w-full"
               />
 
-              {/* Dynamic input fields for expenses */}
               {weeklyValues.expenses.map((expense, index) => (
                 <div key={index} className="flex space-x-4 mb-2">
                   <input
@@ -300,7 +291,6 @@ export const Budget = () => {
                 className="border border-gray-300 p-2 mb-2 w-full"
               />
 
-              {/* Dynamic input fields for expenses */}
               {monthlyValues.expenses.map((expense, index) => (
                 <div key={index} className="flex space-x-4 mb-2">
                   <input
@@ -339,7 +329,6 @@ export const Budget = () => {
         </div>
       </div>
 
-      {/* Display Expenses as Cards based on Tab */}
       <div className="flex space-x-4 mt-4">
         <div className="flex-1 bg-white p-4 rounded-md shadow-md scrollable-card">
           <h2 className="text-lg font-semibold mb-2 sticky-heading">
@@ -347,7 +336,6 @@ export const Budget = () => {
           </h2>
           {tab === "weekly"
             ? weeklyExpenses.map((item, index) => (
-                // Render Weekly Expenses as Cards
                 <div
                   key={index}
                   className="mb-4 p-4 border border-gray-300 rounded"
@@ -367,7 +355,7 @@ export const Budget = () => {
                   <p className="text-sm mb-2">
                     Budget Amount: {item.budgetAmount}
                   </p>
-                  {/* Render Expenses within the Weekly Budget Card */}
+
                   <div className="mt-2">
                     {item.expenses.map((expense, expenseIndex) => (
                       <div
@@ -384,7 +372,6 @@ export const Budget = () => {
                 </div>
               ))
             : monthlyBudgets.map((budget, index) => (
-                // Render Monthly Budgets as Cards
                 <div
                   key={index}
                   className="mb-4 p-4 border border-gray-300 rounded"
@@ -399,7 +386,6 @@ export const Budget = () => {
                     Total Expenses: {budget.expenses.length}
                   </p>
 
-                  {/* Render Expenses within the Monthly Budget Card */}
                   <div className="mt-2">
                     {budget.expenses.map((expense, expenseIndex) => (
                       <div

@@ -14,6 +14,7 @@ export const Group = () => {
   const [availableUsers, setAvailableUsers] = useState([]);
   const [balances, setBalances] = useState(null);
   const user = JSON.parse(localStorage.getItem("user"));
+  const [transactions, setTransactions] = useState([]);
 
   const handlePaidByChange = (e) => {
     setPaidBy(e.target.value);
@@ -50,36 +51,49 @@ export const Group = () => {
       splitBetween: selectedUsers,
     };
     await axios.post(`/api/groupTransaction/createTransactions`, data);
-    // Fetch user balances after submitting the form
+    fetchGroupAndBalances();
   };
 
+  const fetchGroupAndBalances = async () => {
+    try {
+      const groupResponse = await axios.get(`/api/groups/getGroup/${code}`);
+      setGroup(groupResponse.data);
+      setAvailableUsers(groupResponse.data.users);
+
+      const groupId = groupResponse.data._id;
+      const userEmail = user.email;
+      const balancesResponse = await axios.get(
+        `/api/groupTransaction/balances/${groupId}`,
+        { params: { userEmail } }
+      );
+      setBalances(balancesResponse.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching group and balances:", error);
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchGroupAndBalances = async () => {
-      try {
-        // Fetch group data
-        const groupResponse = await axios.get(`/api/groups/getGroup/${code}`);
-        setGroup(groupResponse.data);
-        setAvailableUsers(groupResponse.data.users);
-        console.log(groupResponse.data._id);
-
-        // Fetch user balances
-        const groupId = groupResponse.data._id;
-        const userEmail = user.email; // Replace this with the appropriate way to get the user's email
-        const balancesResponse = await axios.get(
-          `/api/groupTransaction/balances/${groupId}`,
-          { params: { userEmail } } // Pass user email as a query parameter
-        );
-        setBalances(balancesResponse.data);
-        console.log(balancesResponse.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching group and balances:", error);
-        setLoading(false); // Ensure loading state is updated even in case of errors
-      }
-    };
-
     fetchGroupAndBalances();
   }, [code]);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const transactionsResponse = await axios.get(
+          `/api/groupTransaction/groupTransactions/${group._id}`
+        );
+        console.log(transactionsResponse.data);
+        setTransactions(transactionsResponse.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+    if (group && group._id) {
+      fetchTransactions();
+    }
+  }, [group]);
 
   if (loading || !group) {
     return <div>Loading...</div>;
@@ -131,6 +145,55 @@ export const Group = () => {
           </div>
         </div>
       )}
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold mb-4">Transactions</h3>
+        {transactions && (
+          <div
+            className="mb-4 bg-white p-4 rounded-md shadow-md overflow-auto"
+            style={{ height: "400px" }}
+          >
+            <ul>
+              {transactions
+                .filter(
+                  (transaction) =>
+                    transaction.source === user.email ||
+                    transaction.destination === user.email
+                )
+                .slice()
+                .reverse()
+                .map((transaction, index) =>
+                  transaction.transactions.map((t, i) => (
+                    <li key={index + "-" + i} className="mb-4 border-b pb-4">
+                      <div className="flex flex-wrap">
+                        <div className="w-full md:w-1/3 mb-2 md:mb-0">
+                          <span className="font-semibold">Source:</span>{" "}
+                          {transaction.source}
+                        </div>
+                        <div className="w-full md:w-1/3 mb-2 md:mb-0">
+                          <span className="font-semibold">Timestamp:</span>{" "}
+                          {new Date(t.timestamp).toLocaleString()}
+                        </div>
+                        <div className="w-full md:w-1/3">
+                          <span className="font-semibold">Destination:</span>{" "}
+                          {transaction.destination}
+                        </div>
+                      </div>
+                      <div className="w-full mt-2">
+                        <span className="font-semibold">Description:</span>{" "}
+                        {t.description}
+                      </div>
+                      <div className="w-full">
+                        <span className="font-semibold">Amount:</span>{" "}
+                        {t.amount}
+                      </div>
+                    </li>
+                  ))
+                )}
+            </ul>
+          </div>
+        )}
+      </div>
+
       <div
         className="flex-1 bg-white p-4 rounded-md shadow-md "
         style={{ width: "50%" }}
