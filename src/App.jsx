@@ -21,7 +21,9 @@ const App = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socketInstance = io("http://localhost:3000");
+    const socketInstance = io(
+      "https://expense-tracker-backend-g51m.onrender.com  "
+    );
     setSocket(socketInstance);
 
     return () => {
