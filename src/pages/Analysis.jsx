@@ -171,14 +171,7 @@ export const Analysis = () => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "20px",
-        padding: "20px",
-      }}
-    >
+    <div className="analysis-container">
       <div className="chart-container">
         <div className="chart-info">
           <h2 className="text-lg font-semibold mb-2">Expenses</h2>

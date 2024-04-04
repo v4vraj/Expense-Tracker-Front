@@ -14,6 +14,7 @@ import { NewDasboard } from "./pages/NewDashboard";
 import { Splitwise } from "./pages/Splitwise";
 import io from "socket.io-client";
 import { Group } from "./pages/Group";
+import "./App.css";
 
 const App = () => {
   const token = localStorage.getItem("token");
@@ -32,7 +33,7 @@ const App = () => {
 
   return (
     <Router>
-      <div className="flex h-screen">
+      <div className="flex h-screen main-screen">
         {token ? <Sidebar /> : null}
         <Routes>
           <Route path="/login" element={<Login />} />

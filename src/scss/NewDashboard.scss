@@ -1,51 +1,69 @@
-.scrollable-card {
-  overflow: auto;
-  max-height: 400px;
-  scrollbar-width: thin;
-  scrollbar-color: #718096 #e2e8f0;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #718096;
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background-color: #e2e8f0;
+.top-section {
+  .box-section {
+    display: flex;
+    gap: 2%;
+    justify-content: center;
+    margin-top: 2%;
+    color: white;
+    .box-content {
+      width: 33%;
+    }
   }
 }
-.expense-card,
-.income-card,
-.total-card {
-  flex: 1;
-  background-color: white;
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 16px;
-}
-
-.sticky-heading {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.expense-card {
-  border: 1px solid #d1d5db;
-}
-
-.income-card {
-  border: 1px solid #d1d5db;
-}
-
-.total-card {
-  border: 1px solid #d1d5db;
-}
-
 .box-section {
-  margin-top: 5%;
+  .heading {
+    color: white;
+    margin: 2% 0;
+  }
+  .scrollable-card {
+    overflow: auto;
+    max-height: 400px;
+    scrollbar-width: thin;
+    scrollbar-color: #718096 #e2e8f0;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #718096;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: #e2e8f0;
+    }
+  }
+  .expense-card,
+  .income-card,
+  .total-card {
+    flex: 1;
+    background-color: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 16px;
+  }
+
+  .sticky-heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .expense-card {
+    border: 1px solid #d1d5db;
+  }
+
+  .income-card {
+    border: 1px solid #d1d5db;
+  }
+
+  .total-card {
+    border: 1px solid #d1d5db;
+  }
+
+  .box-section {
+    margin-top: 5%;
+  }
 }

@@ -1,6 +1,10 @@
 .sidebar {
+  background-color: black;
   &.collapsed {
-    width: 75px;
+    width: 100px;
+    .navItem {
+      justify-content: center;
+    }
   }
 
   .header {
@@ -16,11 +20,17 @@
       max-width: 100%;
     }
   }
-
   .navItem {
+    width: 90%;
+    margin: 0 auto;
+    align-items: center;
     .icon {
       font-size: 20px;
       vertical-align: middle;
     }
+  }
+  .navItem:hover {
+    background-color: #a87ccc;
+    border-radius: 20px 20px 20px 20px;
   }
 }

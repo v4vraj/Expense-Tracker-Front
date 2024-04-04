@@ -11,6 +11,8 @@ export const NewDasboard = () => {
   const [tab, setTab] = useState("monthly");
   const [selectedExpenseOptions, setSelectedExpenseOptions] = useState(null);
   const [selectedIncomeOptions, setSelectedIncomeOptions] = useState(null);
+  const [thisMonthExpense, setThisMonthExpense] = useState(null);
+  const [thisMonthIncome, setThisMonthIncome] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user._id;
@@ -20,7 +22,6 @@ export const NewDasboard = () => {
       const response = await axios.get(`/api/expenses/getExpenses`, {
         params: { userId, ...filters },
       });
-      console.log(response);
       setExpenses(response.data);
     } catch (error) {
       console.error(`Error fetching expenses`, error);
@@ -38,10 +39,59 @@ export const NewDasboard = () => {
     }
   };
 
+  const fetchExpenseOfCurrentMonth = async () => {
+    try {
+      const currentDate = new Date();
+      const startOfMonth = new Date(currentDate);
+      startOfMonth.setUTCHours(0, 0, 0, 0);
+      startOfMonth.setDate(1);
+
+      const endOfMonth = new Date(currentDate);
+      endOfMonth.setUTCHours(23, 59, 59, 999);
+      endOfMonth.setMonth(endOfMonth.getMonth() + 1, 0);
+
+      const filtersThisMonth = {
+        startDate: startOfMonth,
+        endDate: endOfMonth,
+      };
+      const response = await axios.get(`/api/expenses/getExpenses`, {
+        params: { userId, ...filtersThisMonth },
+      });
+      setThisMonthExpense(response.data);
+    } catch (error) {
+      console.error(`Error fetching expenses`, error);
+    }
+  };
+  const fetchIncomeOfCurrentMonth = async () => {
+    try {
+      const currentDate = new Date();
+      const startOfMonth = new Date(currentDate);
+      startOfMonth.setUTCHours(0, 0, 0, 0);
+      startOfMonth.setDate(1);
+
+      const endOfMonth = new Date(currentDate);
+      endOfMonth.setUTCHours(23, 59, 59, 999);
+      endOfMonth.setMonth(endOfMonth.getMonth() + 1, 0);
+
+      const filtersThisMonth = {
+        startDate: startOfMonth,
+        endDate: endOfMonth,
+      };
+      const response = await axios.get("/api/incomes/getIncomes", {
+        params: { userId, ...filtersThisMonth },
+      });
+      setThisMonthIncome(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchWeeklyExpenses();
     fetchMonthlyBudgets();
     fetchExpenses();
+    fetchExpenseOfCurrentMonth();
+    fetchIncomeOfCurrentMonth();
     fetchIncomes();
   }, []);
 
@@ -58,9 +108,26 @@ export const NewDasboard = () => {
 
   const fetchMonthlyBudgets = async () => {
     try {
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const currentMonthIndex = new Date().getMonth();
+      const currentMonthName = months[currentMonthIndex];
       const response = await axios.get("/api/monthlyBudget/getMonthlyBudgets", {
-        params: { userId },
+        params: { userId, currentMonthName },
       });
+      console.log(response.data);
       setMonthlyBudgets(response.data);
     } catch (error) {
       console.error("Error fetching monthly budgets:", error);
@@ -83,7 +150,7 @@ export const NewDasboard = () => {
           startDate: currentDate,
           endDate: new Date(currentDate.setUTCHours(23, 59, 59, 999)),
         };
-        console.log(filtersToday);
+
         fetchExpenses(filtersToday);
         setSelectedExpenseOptions(item);
         break;
@@ -101,7 +168,6 @@ export const NewDasboard = () => {
           startDate: startOfWeek,
           endDate: endOfWeek,
         };
-        console.log(filtersThisWeek);
         fetchExpenses(filtersThisWeek);
         setSelectedExpenseOptions(item);
         break;
@@ -119,7 +185,6 @@ export const NewDasboard = () => {
           startDate: startOfMonth,
           endDate: endOfMonth,
         };
-        console.log(filtersThisMonth);
         fetchExpenses(filtersThisMonth);
         setSelectedExpenseOptions(item);
         break;
@@ -137,7 +202,6 @@ export const NewDasboard = () => {
           startDate: startOfYear,
           endDate: endOfYear,
         };
-        console.log(filtersThisYear);
         fetchExpenses(filtersThisYear);
         setSelectedExpenseOptions(item);
         break;
@@ -160,7 +224,6 @@ export const NewDasboard = () => {
           startDate: currentDate,
           endDate: new Date(currentDate.setUTCHours(23, 59, 59, 999)),
         };
-        console.log(filtersToday);
         fetchIncomes(filtersToday);
         setSelectedIncomeOptions(item);
         break;
@@ -178,7 +241,6 @@ export const NewDasboard = () => {
           startDate: startOfWeek,
           endDate: endOfWeek,
         };
-        console.log(filtersThisWeek);
         fetchIncomes(filtersThisWeek);
         setSelectedIncomeOptions(item);
         break;
@@ -196,7 +258,6 @@ export const NewDasboard = () => {
           startDate: startOfMonth,
           endDate: endOfMonth,
         };
-        console.log(filtersThisMonth);
         fetchIncomes(filtersThisMonth);
         setSelectedIncomeOptions(item);
         break;
@@ -214,7 +275,6 @@ export const NewDasboard = () => {
           startDate: startOfYear,
           endDate: endOfYear,
         };
-        console.log(filtersThisYear);
         fetchIncomes(filtersThisYear);
         setSelectedIncomeOptions(item);
         break;
@@ -224,16 +284,48 @@ export const NewDasboard = () => {
         break;
     }
   };
+  const calculateTotal = (items) => {
+    // Check if items is null or undefined
+    if (!items) {
+      return 0; // Return 0 or any default value if items is null or undefined
+    }
+
+    // Use reduce method only if items is not null or undefined
+    return items.reduce((total, item) => total + item.amount, 0);
+  };
 
   return (
     <div
       className="mx-auto"
-      style={{ overflow: "auto", scrollbarWidth: "none", width: "80%" }}
+      style={{ overflow: "auto", scrollbarWidth: "none", width: "90%" }}
     >
+      <div className="top-section">
+        <h1 style={{ color: "white" }}>Monthly Overview</h1>
+        <div className=" box-section">
+          <div className="box-content border border-gray-300 rounded">
+            <h2>Budget</h2>
+            {monthlyBudgets.map((item, index) => (
+              <div key={index}>
+                <h3>{item.month}</h3>
+                <p>{item.budgetAmount}</p>
+              </div>
+            ))}
+          </div>
+          <div className="box-content border border-gray-300 rounded">
+            <h2>Total Expenses</h2>
+            <p>Total Amount: {calculateTotal(thisMonthExpense).toFixed(2)}</p>
+          </div>
+          <div className="box-content border border-gray-300 rounded">
+            <h2>Total Incomes</h2>
+            <p>Total Amount: {calculateTotal(thisMonthIncome).toFixed(2)}</p>
+          </div>
+        </div>
+      </div>
+
       <Analysis />
 
       <div className="box-section">
-        <h2 className="text-2xl font-semibold mb-4">Budgets</h2>
+        <h2 className="text-2xl font-semibold mb-4 heading">Budgets</h2>
         <div className="flex space-x-4 justify-end mb-4">
           <button
             className={`py-2 px-4 rounded ${
@@ -333,7 +425,7 @@ export const NewDasboard = () => {
       </div>
 
       <div className="box-section">
-        <h2 className="text-2xl font-semibold mb-4">Expenses</h2>
+        <h2 className="text-2xl font-semibold mb-4 heading">Expenses</h2>
         <div className="flex space-x-4 justify-end mb-4">
           <button
             className={`py-2 px-4 rounded ${
@@ -414,7 +506,7 @@ export const NewDasboard = () => {
       </div>
 
       <div className="box-section">
-        <h2 className="text-2xl font-semibold mb-4">Incomes</h2>
+        <h2 className="text-2xl font-semibold mb-4 heading">Incomes</h2>
         <div className="flex space-x-4 justify-end mb-4">
           <button
             className={`py-2 px-4 rounded ${
